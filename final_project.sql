@@ -1,5 +1,5 @@
 -- Фінальний проєкт: схема pandemic, нормалізація, аналіз, функції.
--- Імпорт CSV у psql: \copy infectious_cases FROM 'data/infectious_cases.csv' WITH (FORMAT csv, HEADER true)
+-- Файл запускається в psql: psql -d <база> -f final_project.sql (з кореня репозиторію).
 
 -- 1. Схема pandemic
 CREATE SCHEMA IF NOT EXISTS pandemic;
@@ -25,11 +25,14 @@ CREATE TABLE infectious_cases (
     number_cholera_cases  TEXT
 );
 
+-- 1. Імпорт CSV (команда psql, запускати з кореня репозиторію)
+\copy infectious_cases FROM 'data/infectious_cases.csv' WITH (FORMAT csv, HEADER true)
+
 -- 1. Перегляд даних
 SELECT *
 FROM infectious_cases
 ORDER BY entity, year
-LIMIT 10
+LIMIT 10;
 
 -- 2. Таблиця entities
 CREATE TABLE entities (
@@ -94,7 +97,7 @@ JOIN entities AS e ON e.id = c.entity_id
 WHERE c.number_rabies IS NOT NULL
 GROUP BY e.id, e.entity, e.code
 ORDER BY AVG(c.number_rabies) DESC
-LIMIT 10
+LIMIT 10;
 
 -- 4. Різниця в роках (вбудовані функції)
 SELECT
@@ -107,7 +110,7 @@ SELECT
 FROM cases AS c
 JOIN entities AS e ON e.id = c.entity_id
 ORDER BY e.entity, c.year
-LIMIT 10
+LIMIT 10;
 
 -- 5. Функція year_diff
 CREATE OR REPLACE FUNCTION year_diff(p_year INTEGER)
@@ -127,7 +130,7 @@ SELECT
 FROM cases AS c
 JOIN entities AS e ON e.id = c.entity_id
 ORDER BY e.entity, c.year
-LIMIT 10
+LIMIT 10;
 
 -- 5. Функція avg_cases_per_period
 CREATE OR REPLACE FUNCTION avg_cases_per_period(cases_per_year NUMERIC, divisor NUMERIC)
@@ -149,4 +152,4 @@ SELECT
 FROM infectious_cases
 WHERE number_rabies ~ '^[0-9]+(\.[0-9]+)?$'
 ORDER BY number_rabies::NUMERIC DESC
-LIMIT 10
+LIMIT 10;
